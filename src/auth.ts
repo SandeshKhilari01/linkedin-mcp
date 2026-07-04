@@ -36,9 +36,18 @@ class LinkedInAuth {
   private authUrl = 'https://www.linkedin.com/oauth/v2';
 
   constructor() {
-    // Advanced credential validation
-    this.clientId = this.validateCredential('LINKEDIN_CLIENT_ID');
-    this.clientSecret = this.validateCredential('LINKEDIN_CLIENT_SECRET');
+    // Check if a static token is provided manually
+    const staticToken = process.env.LINKEDIN_ACCESS_TOKEN;
+    if (staticToken) {
+      this.accessToken = staticToken;
+      this.tokenExpiry = Date.now() + 365 * 24 * 60 * 60 * 1000; // 1 year expiry
+      this.clientId = '';
+      this.clientSecret = '';
+    } else {
+      // Advanced credential validation
+      this.clientId = this.validateCredential('LINKEDIN_CLIENT_ID');
+      this.clientSecret = this.validateCredential('LINKEDIN_CLIENT_SECRET');
+    }
 
     // Log authentication initialization
     this.logAuthInitialization();
@@ -63,12 +72,20 @@ class LinkedInAuth {
    */
   public async authenticate(): Promise<void> {
     try {
+      // Bypasses network auth request if a manual token is supplied
+      if (process.env.LINKEDIN_ACCESS_TOKEN) {
+        this.accessToken = process.env.LINKEDIN_ACCESS_TOKEN;
+        this.tokenExpiry = Date.now() + 365 * 24 * 60 * 60 * 1000;
+        this.logAuthSuccess();
+        return;
+      }
+
       // Increment authentication attempts
       this.authAttempts++;
 
       // Check if we have valid token
       if (this.accessToken && this.tokenExpiry && Date.now() < this.tokenExpiry) {
-        console.log('🔑 Using existing valid token');
+        console.error('🔑 Using existing valid token');
         return;
       }
 
@@ -108,7 +125,7 @@ class LinkedInAuth {
    */
   private async refreshAccessToken(): Promise<void> {
     try {
-      console.log('🔄 Refreshing access token');
+      console.error('🔄 Refreshing access token');
       
       if (!this.refreshToken) {
         throw new Error('No refresh token available');
@@ -130,7 +147,7 @@ class LinkedInAuth {
       }
       this.tokenExpiry = Date.now() + (response.data.expires_in * 1000);
       
-      console.log('🔄 Token refreshed successfully');
+      console.error('🔄 Token refreshed successfully');
     } catch (error) {
       console.error('🚨 Token refresh failed', error);
       // If refresh fails, reset tokens and force new authentication
@@ -177,7 +194,7 @@ class LinkedInAuth {
    * Innovative logging methods to track authentication lifecycle
    */
   private logAuthInitialization() {
-    console.log(`
+    console.error(`
     ╔══════════════════════════════════════════╗
     ║   LinkedInMCP Authentication Initiated   ║
     ║   Developed by Dishant Kumar             ║
@@ -186,7 +203,7 @@ class LinkedInAuth {
   }
 
   private logAuthSuccess() {
-    console.log(`
+    console.error(`
     ✅ LinkedIn Authentication Successful
     🕒 Timestamp: ${new Date().toISOString()}
     🔑 Authentication Attempts: ${this.authAttempts}

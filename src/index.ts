@@ -52,127 +52,239 @@ class LinkedInMcpServer {
    */
   private registerTools() {
     // Search People Tool
-    this.server.registerTool({
-      name: "search-people",
-      description: "Search for LinkedIn profiles based on various criteria",
-      parameters: z.object({
-        keywords: z.string().optional().describe("Keywords to search for in profiles"),
-        currentCompany: z.array(z.string()).optional().describe("Filter by current company"),
-        industries: z.array(z.string()).optional().describe("Filter by industries"),
-        location: z.string().optional().describe("Filter by location")
-      }),
-      handler: async (params) => {
+    this.server.registerTool(
+      "search-people",
+      {
+        description: "Search for LinkedIn profiles based on various criteria",
+        inputSchema: z.object({
+          keywords: z.string().optional().describe("Keywords to search for in profiles"),
+          currentCompany: z.array(z.string()).optional().describe("Filter by current company"),
+          industries: z.array(z.string()).optional().describe("Filter by industries"),
+          location: z.string().optional().describe("Filter by location")
+        })
+      },
+      async (params) => {
         console.error("🔍 Executing LinkedIn People Search");
         try {
           const results = await this.linkedinClient.searchPeople(params);
-          return results;
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify(results, null, 2)
+              }
+            ]
+          };
         } catch (error) {
           console.error("❌ LinkedIn People Search Failed", error);
           throw error;
         }
       }
-    });
+    );
 
     // Get Profile Tool
-    this.server.registerTool({
-      name: "get-profile",
-      description: "Retrieve detailed LinkedIn profile information",
-      parameters: z.object({
-        publicId: z.string().optional().describe("Public ID of the LinkedIn profile"),
-        urnId: z.string().optional().describe("URN ID of the LinkedIn profile")
-      }),
-      handler: async (params) => {
+    this.server.registerTool(
+      "get-profile",
+      {
+        description: "Retrieve detailed LinkedIn profile information",
+        inputSchema: z.object({
+          publicId: z.string().optional().describe("Public ID of the LinkedIn profile"),
+          urnId: z.string().optional().describe("URN ID of the LinkedIn profile")
+        })
+      },
+      async (params) => {
         console.error("🔍 Retrieving LinkedIn Profile");
         try {
           const profile = await this.linkedinClient.getProfile(params);
-          return profile;
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify(profile, null, 2)
+              }
+            ]
+          };
         } catch (error) {
           console.error("❌ LinkedIn Profile Retrieval Failed", error);
           throw error;
         }
       }
-    });
+    );
 
     // Search Jobs Tool
-    this.server.registerTool({
-      name: "search-jobs",
-      description: "Search for LinkedIn job postings based on various criteria",
-      parameters: z.object({
-        keywords: z.string().optional().describe("Keywords to search for in job postings"),
-        companies: z.array(z.string()).optional().describe("Filter by companies"),
-        location: z.string().optional().describe("Filter by location"),
-        jobType: z.array(z.string()).optional().describe("Filter by job type (e.g., full-time, contract)")
-      }),
-      handler: async (params) => {
+    this.server.registerTool(
+      "search-jobs",
+      {
+        description: "Search for LinkedIn job postings based on various criteria",
+        inputSchema: z.object({
+          keywords: z.string().optional().describe("Keywords to search for in job postings"),
+          companies: z.array(z.string()).optional().describe("Filter by companies"),
+          location: z.string().optional().describe("Filter by location"),
+          jobType: z.array(z.string()).optional().describe("Filter by job type (e.g., full-time, contract)")
+        })
+      },
+      async (params) => {
         console.error("🔍 Executing LinkedIn Job Search");
         try {
           const jobs = await this.linkedinClient.searchJobs(params);
-          return jobs;
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify(jobs, null, 2)
+              }
+            ]
+          };
         } catch (error) {
           console.error("❌ LinkedIn Job Search Failed", error);
           throw error;
         }
       }
-    });
+    );
 
     // Send Message Tool
-    this.server.registerTool({
-      name: "send-message",
-      description: "Send a message to a LinkedIn connection",
-      parameters: z.object({
-        recipientUrn: z.string().describe("URN of the message recipient"),
-        messageBody: z.string().describe("Content of the message to send")
-      }),
-      handler: async (params) => {
+    this.server.registerTool(
+      "send-message",
+      {
+        description: "Send a message to a LinkedIn connection",
+        inputSchema: z.object({
+          recipientUrn: z.string().describe("URN of the message recipient"),
+          messageBody: z.string().describe("Content of the message to send")
+        })
+      },
+      async (params) => {
         console.error("📨 Sending LinkedIn Message");
         try {
           const result = await this.linkedinClient.sendMessage(params);
-          return result;
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify(result, null, 2)
+              }
+            ]
+          };
         } catch (error) {
           console.error("❌ LinkedIn Message Sending Failed", error);
           throw error;
         }
       }
-    });
+    );
 
     // Get My Profile Tool
-    this.server.registerTool({
-      name: "get-my-profile",
-      description: "Retrieve the current user's LinkedIn profile information",
-      parameters: z.object({}),
-      handler: async () => {
+    this.server.registerTool(
+      "get-my-profile",
+      {
+        description: "Retrieve the current user's LinkedIn profile information",
+        inputSchema: z.object({})
+      },
+      async () => {
         console.error("🔍 Retrieving Current User Profile");
         try {
           const profile = await this.linkedinClient.getMyProfile();
-          return profile;
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify(profile, null, 2)
+              }
+            ]
+          };
         } catch (error) {
           console.error("❌ Current User Profile Retrieval Failed", error);
           throw error;
         }
       }
-    });
+    );
 
     // Get Network Statistics Tool
-    this.server.registerTool({
-      name: "get-network-stats",
-      description: "Retrieve network statistics for the current user",
-      parameters: z.object({}),
-      handler: async () => {
+    this.server.registerTool(
+      "get-network-stats",
+      {
+        description: "Retrieve network statistics for the current user",
+        inputSchema: z.object({})
+      },
+      async () => {
         console.error("🔍 Retrieving Network Statistics");
         try {
           const stats = await this.linkedinClient.getNetworkStats();
-          return stats;
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify(stats, null, 2)
+              }
+            ]
+          };
         } catch (error) {
           console.error("❌ Network Statistics Retrieval Failed", error);
           throw error;
         }
       }
-    });
+    );
+
+    // Get Connections Tool
+    this.server.registerTool(
+      "get-connections",
+      {
+        description: "Retrieve a list of connections for the current user",
+        inputSchema: z.object({})
+      },
+      async () => {
+        console.error("🔍 Retrieving Connections");
+        try {
+          const connections = await this.linkedinClient.getConnections();
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify(connections, null, 2)
+              }
+            ]
+          };
+        } catch (error) {
+          console.error("❌ Connections Retrieval Failed", error);
+          throw error;
+        }
+      }
+    );
+
+    // Create Post Tool
+    this.server.registerTool(
+      "create-post",
+      {
+        description: "Create a text or link post on LinkedIn on behalf of the user",
+        inputSchema: z.object({
+          text: z.string().describe("The text content of the post"),
+          visibility: z.enum(["PUBLIC", "CONNECTIONS"]).optional().describe("Visibility of the post (default: PUBLIC)"),
+          originalUrl: z.string().optional().describe("Optional link/URL to share in the post"),
+          title: z.string().optional().describe("Optional title of the shared link"),
+          description: z.string().optional().describe("Optional description of the shared link")
+        })
+      },
+      async (params) => {
+        console.error("📝 Creating LinkedIn Post");
+        try {
+          const result = await this.linkedinClient.createPost(params);
+          return {
+            content: [
+              {
+                type: "text",
+                text: JSON.stringify(result, null, 2)
+              }
+            ]
+          };
+        } catch (error) {
+          console.error("❌ LinkedIn Post Creation Failed", error);
+          throw error;
+        }
+      }
+    );
   }
 
   // Add a unique method to showcase the creator's innovation
   private addCreatorSignature() {
-    console.log(`
+    console.error(`
     ╔══════════════════════════════════════════╗
     ║       LinkedInMCP by Dishant Kumar       ║
     ║   Revolutionizing Professional Network   ║
@@ -197,7 +309,7 @@ class LinkedInMcpServer {
 
 // Main execution with creator's personal mark
 async function main() {
-  console.log(`
+  console.error(`
   ╭─────────────────────────────────────────╮
   │ LinkedInMCP - Innovated by Dishant Kumar│
   ╰─────────────────────────────────────────╯

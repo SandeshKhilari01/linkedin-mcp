@@ -1,0 +1,34 @@
+# Dependency directories
+node_modules/
+
+# Build outputs
+dist/
+
+# Environment variables
+.env
+.env*.local
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Puppeteer user data / session files
+user_data/
+
+# Debug screenshots
+*.png
+
+# Exclude root-level ad-hoc testing/debug scripts
+/*.js
+/*.ts
+
+# IDE configs
+.vscode/
+.idea/
